@@ -52,6 +52,14 @@ class TestBootAvaliador(unittest.TestCase):
         self.assertTrue(any("google.com" in l for l in links))
         self.assertTrue(any("t.me" in l for l in links))
 
+        # Testa rejeição de mensagens com pontuação de frase, horários e emojis (falsos positivos)
+        false_positive_text = (
+            "O pedido de hoje foi concluído.Por favor, todos entrem em contato com seus "
+            "respectivos recepcionistas amanhã entre 9h e 9.30h para receber a recompensa de R$10 pelo check-in! Boa noite 💫💫💫"
+        )
+        false_links = handler.extract_links(false_positive_text)
+        self.assertEqual(len(false_links), 0)
+
     def test_evaluated_links_tracking(self):
         test_json = "test_eval_config.json"
         from config_manager import save_evaluated_link, is_link_evaluated, get_evaluated_link_info
