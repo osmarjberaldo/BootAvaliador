@@ -1,0 +1,26 @@
+# Python & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.spec
+dist/
+build/
+scratch/
+test_*.json
+test_prints_tmp/
+test_*.txt
+
+# Perfis de Navegador & Sessões de Usuário
+chrome_profile/
+*.session
+*.session-journal
+credenciais.txt
+
+# Pasta de comprovantes temporários
+prints/*
+!prints/.gitkeep
+
+# IDE e Sistema
+.vscode/
+.idea/
+*.log
