@@ -83,19 +83,27 @@ class TestBootAvaliador(unittest.TestCase):
         test_json = "test_rollover_config.json"
         from config_manager import save_evaluated_link, cleanup_old_evaluated_links, is_link_evaluated, clear_all_evaluated_links
         import json
+        import datetime
+
+        # Datas dinâmicas: ontem e hoje relativos à data real (evita falha quando a data muda)
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(days=1)
+        today_prefix = today.strftime("%Y-%m-%d")
+        date_ontem = yesterday.strftime("%Y-%m-%d") + " 10:00:00"
+        date_hoje = today.strftime("%Y-%m-%d") + " 09:00:00"
 
         # Insere dados de ontem e de hoje
         cfg = {
             "evaluated_links": {
                 "maps.app.goo.gl/link_ontem": {
                     "url": "https://maps.app.goo.gl/link_ontem",
-                    "date": "2026-09-19 10:00:00",
+                    "date": date_ontem,
                     "screenshot_path": "prints/ontem.png",
                     "status": "avaliado"
                 },
                 "maps.app.goo.gl/link_hoje": {
                     "url": "https://maps.app.goo.gl/link_hoje",
-                    "date": "2026-09-20 09:00:00",
+                    "date": date_hoje,
                     "screenshot_path": "prints/hoje.png",
                     "status": "avaliado"
                 }
@@ -104,8 +112,8 @@ class TestBootAvaliador(unittest.TestCase):
         with open(test_json, "w", encoding="utf-8") as f:
             json.dump(cfg, f)
 
-        # Executa limpeza considerando 2026-09-20 como data de hoje
-        removed = cleanup_old_evaluated_links(json_path=test_json, reference_date="2026-09-20")
+        # Executa limpeza considerando a data de hoje como referência
+        removed = cleanup_old_evaluated_links(json_path=test_json, reference_date=today_prefix)
         self.assertEqual(removed, 1)
         self.assertFalse(is_link_evaluated("https://maps.app.goo.gl/link_ontem", json_path=test_json))
         self.assertTrue(is_link_evaluated("https://maps.app.goo.gl/link_hoje", json_path=test_json))

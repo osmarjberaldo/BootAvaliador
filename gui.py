@@ -970,8 +970,8 @@ class BootAvaliadorApp(ctk.CTk):
         )
         btn_action.pack(fill="x", padx=30, pady=(10, 20))
 
-        # Centraliza exatamente no monitor / janela pai e exibe
-        center_window(dialog, 460, 470, parent=self)
+        # Centraliza exatamente no monitor / janela pai e exibe (altura maior para o botão nunca ficar cortado)
+        center_window(dialog, 460, 500, parent=self)
         dialog.deiconify()
         dialog.grab_set()
         dialog.focus()
@@ -1031,20 +1031,27 @@ class BootAvaliadorApp(ctk.CTk):
         entry_2fa = ctk.CTkEntry(f, placeholder_text="Opcional se não usar 2FA", show="*")
         entry_2fa.pack(fill="x", pady=(0, 15))
 
+        def _confirm(event=None):
+            self._handle_submit_code(entry_code.get().strip(), entry_2fa.get().strip(), code_dialog)
+
+        # Enter confirma o código de qualquer campo
+        entry_code.bind("<Return>", _confirm)
+        entry_2fa.bind("<Return>", _confirm)
+
         btn_verify = ctk.CTkButton(
             code_dialog,
             text="Confirmar e Conectar",
             font=ctk.CTkFont(size=13, weight="bold"),
             height=36,
-            command=lambda: self._handle_submit_code(entry_code.get().strip(), entry_2fa.get().strip(), code_dialog)
+            command=_confirm
         )
         btn_verify.pack(fill="x", padx=30, pady=(10, 20))
 
-        # Centraliza exatamente no monitor / janela pai e exibe
-        center_window(code_dialog, 420, 320, parent=self)
+        # Centraliza exatamente no monitor / janela pai e exibe (altura maior para o botão nunca ficar cortado)
+        center_window(code_dialog, 430, 400, parent=self)
         code_dialog.deiconify()
         code_dialog.grab_set()
-        code_dialog.focus()
+        entry_code.focus()
 
     def _handle_submit_code(self, code: str, password_2fa: str, dialog: ctk.CTkToplevel):
         if not code:
