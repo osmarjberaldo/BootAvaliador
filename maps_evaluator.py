@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import datetime
 from typing import Optional, Callable, Dict, Any, List
@@ -16,7 +17,11 @@ PROFILE_DIR = "chrome_profile"
 
 class GoogleMapsEvaluator:
     def __init__(self, prints_dir: str = PRINTS_DIR, profile_dir: str = PROFILE_DIR):
-        self.base_dir = os.path.dirname(os.path.abspath(__file__))
+        # Quando empacotado pelo PyInstaller, usa a pasta do .exe (e não a pasta temporária de extração)
+        if getattr(sys, "frozen", False):
+            self.base_dir = os.path.dirname(os.path.abspath(sys.executable))
+        else:
+            self.base_dir = os.path.dirname(os.path.abspath(__file__))
         self.prints_dir = os.path.join(self.base_dir, prints_dir)
         self.profile_dir = os.path.join(self.base_dir, profile_dir)
         

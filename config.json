@@ -9,5 +9,12 @@
     "target_recipient_id": 1538766525,
     "target_recipient_name": "[Contato] Helena Da Silva",
     "auto_send_screenshot": true,
-    "evaluated_links": {}
+    "evaluated_links": {
+        "maps.app.goo.gl/9kpzagavghd3alrk6": {
+            "url": "https://maps.app.goo.gl/9KpzaGavghd3aLRk6",
+            "date": "2026-09-21 08:59:34",
+            "screenshot_path": "C:\\xampp\\htdocs\\BootAvaliador\\prints\\avaliacao_postada_20260921_085932.png",
+            "status": "avaliado"
+        }
+    }
 }

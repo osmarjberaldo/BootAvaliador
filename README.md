@@ -46,6 +46,60 @@ python gui.py
 
 ---
 
+## 📦 Gerar o Executável (.exe) com PyInstaller
+
+Para distribuir o aplicativo sem precisar de Python instalado, gere o `.exe` com o PyInstaller.
+
+### 1. Instalar o PyInstaller (apenas uma vez)
+```bash
+pip install pyinstaller
+```
+
+### 2. Comando de Build (One-Dir — recomendado)
+Gera o `.exe` em `dist/BootAvaliador/BootAvaliador.exe` junto com as DLLs e assets de runtime:
+```bash
+pyinstaller --noconfirm --clean --onedir --windowed --name BootAvaliador \
+  --add-data "logo.png;." \
+  --add-data "logo.ico;." \
+  --icon "logo.ico" \
+  --hidden-import customtkinter \
+  --collect-data customtkinter \
+  --hidden-import telethon \
+  --hidden-import telethon.crypto.libssl \
+  --hidden-import PIL._tkinter_finder \
+  main.py
+```
+
+> 💡 **Nota:** O separador `;` do `--add-data` é o correto no Windows. Em Linux/Mac use `:`.
+
+### 3. Rodar o `.exe`
+O executável deve ficar acompanhado de:
+- `config.json` — criado automaticamente na primeira execução (ao lado do .exe)
+- `prints/` — criada automaticamente
+- `chrome_profile/` — criada na pasta do .exe (persistência do login Google)
+- `boot_avaliador_session.session` — sessão do Telegram (persistente ao lado do .exe)
+
+> ⚠️ **Importante:** Rode sempre o `.exe` a partir da mesma pasta para que `config.json`, sessão do Telegram, prints e perfil do Chrome sejam preservados.
+
+### 4. Opção Portable (One-File)
+Gera um único `BootAvaliador.exe` autoextraível (mais lento para iniciar, pois extrai em temp):
+```bash
+pyinstaller --noconfirm --clean --onefile --windowed --name BootAvaliador \
+  --add-data "logo.png;." \
+  --add-data "logo.ico;." \
+  --icon "logo.ico" \
+  --hidden-import customtkinter \
+  --collect-data customtkinter \
+  --hidden-import telethon \
+  --hidden-import telethon.crypto.libssl \
+  --hidden-import PIL._tkinter_finder \
+  main.py
+```
+
+> ⚠️ **Atenção:** evite empacotar `config.json`, `*.session` ou `chrome_profile/` dentro do exe — esses arquivos precisam ficar graváveis ao lado do executável.
+
+---
+
 ## ⚙️ Arquivo de Configuração (`config.json`)
 
 ```json
@@ -88,4 +142,68 @@ Antes de qualquer conclusão ou entrega de alterações no projeto, execute obri
    - `Envio de Prints`: Envia apenas a foto limpa sem texto para o contato selecionado, sem repetições para locais já avaliados anteriormente.
    - `Confirmação de Post`: Só gera print e só envia comprovante se a postagem no Google Maps for confirmada.
 
+4. **Validação do Build do Executável (após gerar o .exe)**:
+   ```bash
+   python -m PyInstaller --version
+   ```
+   - Confirme que o `dist/BootAvaliador/BootAvaliador.exe` foi criado e abre sem erros.
+   - Confirme que `config.json`, `prints/` e `chrome_profile/` são criados **ao lado do .exe** (não em temp).
+   - Confirme que o ícone `logo.ico` e a logo da splash aparecem corretamente.
 
+---
+
+## 🧰 Scripts Auxiliares
+
+### `build_exe.bat` — Build com Duplo Clique (Windows)
+Script pronto que instala o PyInstaller se faltar, roda a validação de testes e gera o `.exe`:
+
+**Conteúdo sugerido** (salve como `build_exe.bat` na raiz do projeto):
+```bat
+@echo off
+chcp 65001 >nul
+echo ========================================================
+echo   📦 Boot Avaliador - Build do Executavel (PyInstaller)
+echo ========================================================
+echo.
+
+REM 1) Valida testes antes de empacotar
+python test_modules.py
+if errorlevel 1 (
+    echo ❌ Testes falharam. Build cancelado.
+    pause
+    exit /b 1
+)
+
+REM 2) Garante o PyInstaller
+python -m pip show pyinstaller >nul 2>&1
+if errorlevel 1 (
+    echo Instalando PyInstaller...
+    python -m pip install pyinstaller
+)
+
+REM 3) Gera o executavel
+python -m PyInstaller --noconfirm --clean --onedir --windowed --name BootAvaliador ^
+  --add-data "logo.png;." ^
+  --add-data "logo.ico;." ^
+  --icon "logo.ico" ^
+  --hidden-import customtkinter ^
+  --collect-data customtkinter ^
+  --hidden-import telethon ^
+  --hidden-import telethon.crypto.libssl ^
+  --hidden-import PIL._tkinter_finder ^
+  main.py
+
+if errorlevel 1 (
+    echo ❌ Falha no build. Verifique as mensagens acima.
+    pause
+    exit /b 1
+)
+
+echo.
+echo ========================================================
+echo   ✅ Build concluido! Executavel em: dist\BootAvaliador\
+echo ========================================================
+pause
+```
+
+---

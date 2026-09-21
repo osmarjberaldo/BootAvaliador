@@ -19,9 +19,15 @@ def check_requirements():
         print("Instalando dependencias necessarias...")
         subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
 
+def get_app_dir():
+    """Retorna a pasta do aplicativo (pasta do .exe quando empacotado pelo PyInstaller)."""
+    if getattr(sys, "frozen", False):
+        return os.path.dirname(os.path.abspath(sys.executable))
+    return os.path.dirname(os.path.abspath(__file__))
+
 def main():
-    # Define diretório de trabalho local
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    # Define diretório de trabalho local (funciona tanto rodando por python quanto pelo .exe)
+    os.chdir(get_app_dir())
     check_requirements()
     
     from gui import BootAvaliadorApp
